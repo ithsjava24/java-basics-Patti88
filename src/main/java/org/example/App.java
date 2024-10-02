@@ -11,74 +11,77 @@ public class App {
 
         while (true) {
             visaMeny();
-            int val = scanner.nextInt();
+            String val = scanner.nextLine();
 
             switch (val) {
-                case 1:
+                case "1":
                     priser = inmatning(scanner, priser);
                     break;
-                case 2:
+                case "2":
                     visaMinMaxMedel(priser);
                     break;
-                case 3:
-                    sortera(priser);
+                case "3":
+                    printPricesSorted2(priser);
                     break;
-                case 4:
-                    bastaLaddningstid(priser);
+                case "4":
+                    cheapest4Hours(priser);
                     break;
-                case 5: visualisering(priser);
-                case 'e':
-                case 'E':
-                    System.out.println("Programmet avslutas.");
+                case "5": visualisering(priser);
+                case "e":
+                case "E":
+                    System.out.println("Programmet avslutas.\n");
                     return;
                 default:
-                    System.out.println("Ogiltigt val. Vänligen försök igen.");
+                    System.out.print("Ogiltigt val. Vänligen försök igen.\n");
             }
         }
     }
     //menyns utseende
     public static void visaMeny() {
-        System.out.println("Elpriser");
-        System.out.println("========");
-        System.out.println("1. Inmatning");
-        System.out.println("2. Min, Max och Medel");
-        System.out.println("3. Sortera");
-        System.out.println("4. Bästa Laddningstid (4h)");
-        System.out.println("5. Visualisering");
-        System.out.println("e. Avsluta");  }
+        System.out.print("Elpriser\n");
+        System.out.print("========\n");
+        System.out.print("1. Inmatning\n");
+        System.out.print("2. Min, Max och Medel\n");
+        System.out.print("3. Sortera\n");
+        System.out.print("4. Bästa Laddningstid (4h)\n");
+        System.out.print("5. Visualisering\n");
+        System.out.print("e. Avsluta\n");  }
     //skapa metod för varje val användaren väljer alla metoder 2-5 bör få information från inmatnings metoden
     public static double[] inmatning(Scanner scanner, double[] gamlaPriser) {
         // 24 timmars format
         int antalTimmar = 24;
-        double[] nyaPriser = new double[gamlaPriser.length + antalTimmar];
+        double[] nyaPriser = new double[24];
 
-        System.out.println("Ange elpriset i öre/kWh för varje timme på dygnet:");
+        System.out.print("Ange elpriset i öre/kWh för varje timme på dygnet:\n");
         for (int i = 0; i < antalTimmar; i++) {
             String tidsintervall = String.format("%02d-%02d", i, (i + 1) % 24);
             System.out.print(tidsintervall + ": ");
-            nyaPriser[gamlaPriser.length + i] = scanner.nextDouble();
+            nyaPriser[ i] = scanner.nextDouble();
+
         }
+        scanner.nextLine();
 
         return nyaPriser;
     }
     public static void visaMinMaxMedel(double[] priser) {
         if (priser.length == 0) {
-            System.out.println("Inga priser har matats in.");
+            System.out.print("Inga priser har matats in.\n");
             return;
         }
 
-        double min = Double.MAX_VALUE;
-        double max = Double.MIN_VALUE;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
         double summa = 0;
         int minIndex = -1;
         int maxIndex = -1;
 
         for (int i = 0; i < priser.length; i++) {
-            double pris = priser[i];
+            int pris = (int)priser[i];
             if (pris < min) {
                 min = pris;
                 minIndex = i;
-            } else if (pris > max) {
+            }
+            if (pris > max) {
                 max = pris;
                 maxIndex = i;
             }
@@ -92,21 +95,16 @@ public class App {
         // formateraTid för både min och max tid
         String minTid = formateraTid(minIndex);
         String maxTid = formateraTid(maxIndex);
-        System.out.println("Minsta priset under dygnet gång: " + min + " (vid följande tidpunkt: " + minTid + ")");
-        System.out.println("Högsta priset under dygnets gång: " + max + " (vid följande tidpunkt: " + maxTid + ")");
-        System.out.println("Medelpriset för hela dygnet är Ca." + medelInt);
+        System.out.print("Lägsta pris: " + minTid + ", " + min + " öre/kWh"+"\n");
+        System.out.print("Högsta pris: " + maxTid + ", " + max + " öre/kWh"+"\n");
+        System.out.printf("Medelpris: %.2f öre/kWh\n", medel);
 
-
-        // Pausa programmet
-        System.out.println("Tryck Enter för att återgå till huvudmenyn");
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
     }
     public static String formateraTid(int index) {
         // 24-timmars format formatering
-        return String.format("%02d:%02d", index + 1, 0);
+        return String.format("%02d-%02d", index, index+1);
     }
-    public static void sortera(double[] priser) {
+    public static void printPricesSorted2(double[] priser) {
         double[] sorteradePriser = Arrays.copyOf(priser, priser.length);
         Arrays.sort(sorteradePriser);
 
@@ -118,18 +116,19 @@ public class App {
         sorteradePriser = lista.stream().mapToDouble(Double::doubleValue).toArray();
 
 
-        System.out.println("Sorterade priser (högsta först):");
+        System.out.print("Sorterade priser (högsta först):\n");
         for (double pris : sorteradePriser) {
             int index = findIndex(priser, pris);
             String tid = formateraTid(index);
-            System.out.println(pris + " öre/kWh (vid tid: " + tid + ")");
+            System.out.print(tid + " " +(int) pris + " öre\n");
+
+            // 23-24 40 öre
+
         }
 
 
         // Pausa programmet
-        System.out.println("Tryck Enter för att återgå till huvudmenyn");
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
+
     }
     // Hjälpmetod för att hitta indexet för ett visst pris
     public static int findIndex(double[] array, double target) {
@@ -140,9 +139,9 @@ public class App {
         }
         return -1;
     }
-    public static void bastaLaddningstid(double[] priser) {
+    public static void cheapest4Hours(double[] priser) {
         if (priser.length < 4) {
-            System.out.println("För få priser för att beräkna bästa laddningstid.");
+            System.out.print("För få priser för att beräkna bästa laddningstid.\n");
             return;
         }
 
@@ -170,21 +169,15 @@ public class App {
             }
         }
 
-        String startTid = formateraTid(startIndex);
-        String slutTid = formateraTid(startIndex + periodLength - 1);
-        System.out.println("Bästa laddningstid:");
-        System.out.println("Startar: " + startTid);
-        System.out.println("Slutar: " + slutTid);
-        System.out.println("Medelpris under perioden: " + minMedel);
 
-        System.out.println("Tryck Enter för att återgå till huvudmenyn");
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
+        System.out.print("Påbörja laddning klockan " + startIndex+ "\n");
+        System.out.printf("Medelpris 4h: %.1f öre/kWh\n",minMedel);
+
     }
 
     public static void visualisering(double[] priser) {
         if (priser.length == 0) {
-            System.out.println("Inga priser att visualisera.");
+            System.out.print("Inga priser att visualisera.\n");
             return;
         }
 
